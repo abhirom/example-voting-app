@@ -1,0 +1,29 @@
+version: "2.2"
+
+services:
+
+  redis:
+    image: redis
+
+  db:
+    image: postgres:9.4
+    environment: 
+        - POSTGRES_HOST_AUTH_METHOD=trust  
+
+  voting-app:
+    build: ./vote/.
+    ports:
+      - 5000:80
+    depends_on: 
+      - redis
+
+  result-app:
+    build: ./result/.
+    ports:
+      - 5001:80
+
+  worker:
+    build: ./worker
+    links:
+      - db
+      - redis
