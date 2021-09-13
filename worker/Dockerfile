@@ -1,11 +1,16 @@
-FROM microsoft/dotnet:1.0.0-preview2-sdk
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 as builder
 
-WORKDIR /code
+WORKDIR /Worker
+COPY src/Worker/Worker.csproj .
+RUN dotnet restore
 
-ADD src/Worker /code/src/Worker
+COPY src/Worker/ .
+RUN dotnet publish -c Release -o /out Worker.csproj
 
-RUN dotnet restore -v minimal src/ \
-    && dotnet publish -c Release -o ./ src/Worker/ \
-    && rm -rf src/ $HOME/.nuget/
+# app image
+FROM mcr.microsoft.com/dotnet/core/runtime:3.1
 
-CMD dotnet Worker.dll
+WORKDIR /app
+ENTRYPOINT ["dotnet", "Worker.dll"]
+
+COPY --from=builder /out .
