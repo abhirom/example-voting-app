@@ -2,7 +2,7 @@ pipeline{
   agent any
   stages{
     stage('Checkout SCM'){
-      strps{
+      steps{
         git url: 'https://github.com/abhirom/example-voting-app.git'
       }
     }
